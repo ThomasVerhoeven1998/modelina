@@ -1,8 +1,8 @@
 import { JavaRenderer } from '../JavaRenderer';
 import {
   ConstrainedUnionModel,
-  ConstrainedObjectPropertyModel
-} from '../../../models';
+  ConstrainedObjectPropertyModel, ConstrainedReferenceModel, ConstrainedObjectModel
+} from "../../../models";
 import { JavaOptions } from '../JavaGenerator';
 import { UnionPresetType } from '../JavaPreset';
 import { FormatHelpers } from '../../../helpers';
@@ -44,7 +44,7 @@ export class UnionRenderer extends JavaRenderer<ConstrainedUnionModel> {
    * Render all the accessors for the properties
    */
   async renderAccessors(): Promise<string> {
-    const properties = this.model.commonProperties || {};
+    const properties = getCommonUnionProperties(this.model) || {};
     const content: string[] = [];
 
     for (const property of Object.values(properties)) {
@@ -63,6 +63,30 @@ export class UnionRenderer extends JavaRenderer<ConstrainedUnionModel> {
   runSetterPreset(property: ConstrainedObjectPropertyModel): Promise<string> {
     return this.runPreset('setter', { property });
   }
+}
+
+export function getCommonUnionProperties(model: ConstrainedUnionModel): { [key: string]: ConstrainedObjectPropertyModel } {
+  const objectProperties = model.union
+    .map(partModel => partModel instanceof ConstrainedReferenceModel ? partModel.ref : partModel)
+    .filter((partModel): partModel is ConstrainedObjectModel => partModel instanceof ConstrainedObjectModel)
+    .map(partModel => partModel.properties);
+  if (objectProperties.length === 0) {
+    return {};
+  }
+
+  const ignoreOriginalInput = (key: string, value: any) => key === "originalInput" ? undefined : value;
+  // TODO nicer deepEqual?
+  const isEqual = <T>(a: T, b: T) => JSON.stringify(a, ignoreOriginalInput) === JSON.stringify(b, ignoreOriginalInput);
+
+  const commonPropertyList = objectProperties.slice(1)
+    .reduce((commonProperties, properties) => {
+      return commonProperties
+        .filter(([key]) => key in properties)
+        .filter(([key]) => key !== "additionalProperties")
+        .filter(([key, value]) => isEqual(properties[key], value));
+    }, Object.entries(objectProperties[0]));
+
+  return Object.fromEntries(commonPropertyList);
 }
 
 const getterName = (sanitizedName: string, options: JavaOptions): string => {

@@ -182,30 +182,6 @@ export class ConstrainedUnionModel extends ConstrainedMetaModel {
     super(name, originalInput, options, type);
   }
 
-  get commonProperties(): { [key: string]: ConstrainedObjectPropertyModel } {
-    const objectProperties = this.union
-      .map(partModel => partModel instanceof ConstrainedReferenceModel ? partModel.ref : partModel)
-      .filter((partModel): partModel is ConstrainedObjectModel => partModel instanceof ConstrainedObjectModel)
-      .map(partModel => partModel.properties);
-    if (objectProperties.length === 0) {
-      return {};
-    }
-
-    const ignoreOriginalInput = (key: string, value: any) => key === "originalInput" ? undefined : value;
-    // TODO nicer deepEqual?
-    const isEqual = <T>(a: T, b: T) => JSON.stringify(a, ignoreOriginalInput) === JSON.stringify(b, ignoreOriginalInput);
-
-    const commonPropertyList = objectProperties.slice(1)
-      .reduce((commonProperties, properties) => {
-        return commonProperties
-          .filter(([key]) => key in properties)
-          .filter(([key]) => key !== "additionalProperties")
-          .filter(([key, value]) => isEqual(properties[key], value));
-      }, Object.entries(objectProperties[0]));
-
-    return Object.fromEntries(commonPropertyList);
-  }
-
   getNearestDependencies(
     arg?: DeepPartial<GetNearestDependenciesArgument>
   ): ConstrainedMetaModel[] {

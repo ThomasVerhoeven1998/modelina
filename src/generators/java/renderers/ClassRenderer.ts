@@ -11,6 +11,7 @@ import { JavaOptions } from '../JavaGenerator';
 import { ClassPresetType } from '../JavaPreset';
 import { unionIncludesBuiltInTypes } from '../JavaConstrainer';
 import { isEnum } from '../../csharp/Constants';
+import { getCommonUnionProperties } from "./UnionRenderer";
 
 /**
  * Renderer for Java's `class` type
@@ -137,15 +138,10 @@ const getOverride = (
   model: ConstrainedObjectModel,
   property: ConstrainedObjectPropertyModel
 ) => {
-  const overrideFromParent = model.options.parents?.find((parent) => {
-    if (
-      parent instanceof ConstrainedUnionModel &&
-      parent.commonProperties[property.propertyName]
-    ) {
-      return true;
-    }
-    return false;
-  });
+  const overrideFromParent = model.options.parents?.find(parent =>
+    parent instanceof ConstrainedUnionModel &&
+      getCommonUnionProperties(parent)[property.propertyName]
+  );
 
   const overrideFromExtend = model.options.extend?.find((extend) => {
     if (!extend.options.isExtended || isDictionary(model, property)) {
