@@ -32,7 +32,7 @@ export function NO_DUPLICATE_PROPERTIES(
   // Make sure that the given property name is formatted correctly for further comparisons
   const formattedPropertyName = namingFormatter(propertyName);
   let newPropertyName = propertyName;
-  const alreadyPartOfMetaModel = Object.keys(objectModel.properties)
+  const alreadyPartOfMetaModel = Object.keys(objectModel instanceof UnionModel ? objectModel.commonProperties : objectModel.properties)
     .filter((key) => propertyName !== key) // Filter out the potential same property name that we can safely ignore for this check.
     .includes(formattedPropertyName);
   const alreadyPartOfConstrainedModel = Object.keys(

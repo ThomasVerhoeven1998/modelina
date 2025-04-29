@@ -174,8 +174,7 @@ describe('ConstrainedMetaModel', () => {
         'union',
         undefined,
         {},
-        [stringModel, referenceModel],
-        {}
+        [stringModel, referenceModel]
       );
       const unionTupleModel = new TupleValueModel(0, unionModel);
       const stringTupleModel = new TupleValueModel(1, stringModel);
@@ -250,8 +249,7 @@ describe('ConstrainedMetaModel', () => {
         'union',
         undefined,
         {},
-        [stringModel, referenceModel],
-        {}
+        [stringModel, referenceModel]
       );
       const unionObjectPropertyModel = new ObjectPropertyModel(
         'union',
@@ -536,8 +534,7 @@ describe('ConstrainedMetaModel', () => {
         'union',
         undefined,
         {},
-        [stringModel, referenceModel],
-        {}
+        [stringModel, referenceModel]
       );
       const rawModel = new DictionaryModel(
         'test',
@@ -647,8 +644,7 @@ describe('ConstrainedMetaModel', () => {
         'union',
         undefined,
         {},
-        [stringModel, referenceModel],
-        {}
+        [stringModel, referenceModel]
       );
       const rawModel = new ArrayModel('', undefined, {}, unionModel);
 
@@ -673,8 +669,7 @@ describe('ConstrainedMetaModel', () => {
         'test',
         undefined,
         {},
-        [referenceModel, stringModel],
-        {}
+        [referenceModel, stringModel]
       );
 
       const model = constrainMetaModel(mockedTypeMapping, mockedConstraints, {
@@ -695,8 +690,7 @@ describe('ConstrainedMetaModel', () => {
         'test',
         undefined,
         {},
-        [referenceModel, referenceModel],
-        {}
+        [referenceModel, referenceModel]
       );
 
       const model = constrainMetaModel(mockedTypeMapping, mockedConstraints, {
@@ -717,8 +711,7 @@ describe('ConstrainedMetaModel', () => {
         'test',
         undefined,
         {},
-        [referenceModel],
-        {}
+        [referenceModel]
       );
       rawModel.union.push(rawModel);
 
@@ -740,8 +733,7 @@ describe('ConstrainedMetaModel', () => {
         'test',
         undefined,
         {},
-        [stringModel, referenceModel],
-        {}
+        [stringModel, referenceModel]
       );
       rawModel.union.push(rawModel);
       referenceModel.ref = rawModel;
@@ -770,8 +762,7 @@ describe('ConstrainedMetaModel', () => {
         'test',
         undefined,
         {},
-        [referenceModel, referenceModel2],
-        {}
+        [referenceModel, referenceModel2]
       );
 
       const model = constrainMetaModel(mockedTypeMapping, mockedConstraints, {

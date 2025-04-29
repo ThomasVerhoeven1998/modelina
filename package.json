@@ -113,6 +113,7 @@
     "test:runtime:csharp": "cross-env CI=true jest ./test/runtime/runtime-csharp.spec.ts",
     "test:runtime:scala": "cross-env CI=true jest ./test/runtime/runtime-scala.spec.ts",
     "test:watch": "jest --watch",
+    "test:watch:java": "jest --watch --runTestsByPath /Users/reinautk/projects/external/modelina/test/generators/java/JavaGenerator.spec.ts",
     "docs": "npm run docs:api",
     "docs:api": "typedoc --sourceLinkExternal src/index.ts --out ./modelina-website/public/apidocs/generated --name Modelina",
     "lint": "npm run lint:modelina && npm run lint:cli",

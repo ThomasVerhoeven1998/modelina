@@ -457,7 +457,6 @@ Array [
   private Map<String, Object> additionalProperties;
 
   public String getPetType() { return this.petType; }
-  public void setPetType(String petType) { this.petType = petType; }
 
   public String getColor() { return this.color; }
   public void setColor(String color) { this.color = color; }

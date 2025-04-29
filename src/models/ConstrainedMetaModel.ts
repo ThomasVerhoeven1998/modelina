@@ -177,6 +177,7 @@ export class ConstrainedUnionModel extends ConstrainedMetaModel {
     options: ConstrainedMetaModelOptions,
     type: string,
     public union: ConstrainedMetaModel[],
+    // TODO
     public properties: { [key: string]: ConstrainedObjectPropertyModel }
   ) {
     super(name, originalInput, options, type);

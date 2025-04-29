@@ -303,7 +303,7 @@ function unionModelFactory<
   });
   constrainedModel.union = constrainedUnionModels;
 
-  for (const propertyMetaModel of Object.values(context.metaModel.properties)) {
+  for (const propertyMetaModel of Object.values(context.metaModel.commonProperties)) {
     const constrainedPropertyModel = createConstrainedPropertyModel(
       propertyMetaModel,
       constrainedModel,
