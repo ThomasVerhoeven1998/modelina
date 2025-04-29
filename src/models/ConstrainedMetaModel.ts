@@ -2,11 +2,12 @@
 import { DeepPartial, mergePartialAndDefault } from '../utils';
 import { makeUnique } from '../helpers/DependencyHelpers';
 import {
+  findCommonProperties,
   MetaModel,
   MetaModelOptions,
   MetaModelOptionsConst,
-  MetaModelOptionsDiscriminator
-} from './MetaModel';
+  MetaModelOptionsDiscriminator, ObjectModel, ObjectPropertyModel, ReferenceModel
+} from "./MetaModel";
 
 export interface ConstrainedMetaModelOptionsConst
   extends MetaModelOptionsConst {
@@ -176,11 +177,20 @@ export class ConstrainedUnionModel extends ConstrainedMetaModel {
     originalInput: any,
     options: ConstrainedMetaModelOptions,
     type: string,
-    public union: ConstrainedMetaModel[],
-    // TODO
-    public properties: { [key: string]: ConstrainedObjectPropertyModel }
+    public union: ConstrainedMetaModel[]
   ) {
     super(name, originalInput, options, type);
+  }
+
+  get properties(): { [key: string]: ConstrainedObjectPropertyModel } {
+    throw new Error("not allowed");
+  }
+  get commonProperties(): { [key: string]: ConstrainedObjectPropertyModel } {
+    const objectProperties = this.union
+      .map(partModel => partModel instanceof ConstrainedReferenceModel ? partModel.ref : partModel)
+      .filter((partModel): partModel is ConstrainedObjectModel => partModel instanceof ConstrainedObjectModel)
+      .map(partModel => partModel.properties);
+    return findCommonProperties(objectProperties);
   }
 
   getNearestDependencies(

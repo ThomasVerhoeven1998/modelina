@@ -82,12 +82,7 @@ export class ArrayModel extends MetaModel {
   }
 }
 
-function findCommonProperties(union: MetaModel[]): { [key: string]: ObjectPropertyModel } {
-  const objectProperties = union
-    .map(partModel => partModel instanceof ReferenceModel ? partModel.ref : partModel)
-    .filter((partModel): partModel is ObjectModel => partModel instanceof ObjectModel)
-    .map(partModel => partModel.properties);
-
+export function findCommonProperties<T>(objectProperties: { [key: string]: T }[]): { [key: string]: T } {
   if (objectProperties.length === 0) {
     return {};
   }
@@ -119,7 +114,11 @@ export class UnionModel extends MetaModel {
     throw new Error("not allowed");
   }
   get commonProperties(): { [key: string]: ObjectPropertyModel } {
-    return findCommonProperties(this.union);
+    const objectProperties = this.union
+      .map(partModel => partModel instanceof ReferenceModel ? partModel.ref : partModel)
+      .filter((partModel): partModel is ObjectModel => partModel instanceof ObjectModel)
+      .map(partModel => partModel.properties);
+    return findCommonProperties(objectProperties);
   }
 }
 export class EnumValueModel {

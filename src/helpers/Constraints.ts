@@ -36,7 +36,7 @@ export function NO_DUPLICATE_PROPERTIES(
     .filter((key) => propertyName !== key) // Filter out the potential same property name that we can safely ignore for this check.
     .includes(formattedPropertyName);
   const alreadyPartOfConstrainedModel = Object.keys(
-    constrainedObjectModel.properties
+    constrainedObjectModel instanceof ConstrainedUnionModel ? constrainedObjectModel.commonProperties : constrainedObjectModel.properties
   ).includes(formattedPropertyName);
   if (alreadyPartOfMetaModel || alreadyPartOfConstrainedModel) {
     newPropertyName = `reserved_${propertyName}`;

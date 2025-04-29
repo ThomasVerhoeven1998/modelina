@@ -289,8 +289,7 @@ function unionModelFactory<
     context.metaModel.originalInput,
     getConstrainedMetaModelOptions(context.metaModel),
     '',
-    [],
-    {}
+    []
   );
   alreadySeenModels.set(context.metaModel, constrainedModel);
 
@@ -302,18 +301,6 @@ function unionModelFactory<
     );
   });
   constrainedModel.union = constrainedUnionModels;
-
-  for (const propertyMetaModel of Object.values(context.metaModel.commonProperties)) {
-    const constrainedPropertyModel = createConstrainedPropertyModel(
-      propertyMetaModel,
-      constrainedModel,
-      constrainRules,
-      context,
-      alreadySeenModels
-    );
-    constrainedModel.properties[String(constrainedPropertyModel.propertyName)] =
-      constrainedPropertyModel;
-  }
 
   return constrainedModel;
 }

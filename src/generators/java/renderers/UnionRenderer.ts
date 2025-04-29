@@ -44,7 +44,7 @@ export class UnionRenderer extends JavaRenderer<ConstrainedUnionModel> {
    * Render all the accessors for the properties
    */
   async renderAccessors(): Promise<string> {
-    const properties = this.model.properties || {};
+    const properties = this.model.commonProperties || {};
     const content: string[] = [];
 
     for (const property of Object.values(properties)) {

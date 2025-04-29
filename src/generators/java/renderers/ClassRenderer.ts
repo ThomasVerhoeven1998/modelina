@@ -140,7 +140,7 @@ const getOverride = (
   const overrideFromParent = model.options.parents?.find((parent) => {
     if (
       parent instanceof ConstrainedUnionModel &&
-      parent.properties[property.propertyName]
+      parent.commonProperties[property.propertyName]
     ) {
       return true;
     }
