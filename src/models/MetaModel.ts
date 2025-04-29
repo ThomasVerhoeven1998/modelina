@@ -89,7 +89,7 @@ export function findCommonProperties<T>(objectProperties: { [key: string]: T }[]
 
   // TODO deepEqual a, b
   const ignoreOriginalInput = (key: string, value: any) => key === "originalInput" ? undefined : value;
-  const isEqual = (a: ObjectPropertyModel, b: ObjectPropertyModel) => JSON.stringify(a, ignoreOriginalInput) === JSON.stringify(b, ignoreOriginalInput);
+  const isEqual = <T>(a: T, b: T) => JSON.stringify(a, ignoreOriginalInput) === JSON.stringify(b, ignoreOriginalInput);
 
   const commonPropertyList = objectProperties.slice(1)
     .reduce((commonProperties, properties) => {
@@ -109,9 +109,6 @@ export class UnionModel extends MetaModel {
     public union: MetaModel[]
   ) {
     super(name, originalInput, options);
-  }
-  get properties(): { [key: string]: ObjectPropertyModel } {
-    throw new Error("not allowed");
   }
   get commonProperties(): { [key: string]: ObjectPropertyModel } {
     const objectProperties = this.union

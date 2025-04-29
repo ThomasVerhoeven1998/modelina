@@ -70,7 +70,7 @@ export type PropertyKeyContext<Options> = {
   constrainedObjectPropertyModel: ConstrainedObjectPropertyModel;
   objectPropertyModel: ObjectPropertyModel;
   constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel;
-  objectModel: ObjectModel | UnionModel;
+  objectModel: ObjectModel;
   options: Options;
 };
 

@@ -25,14 +25,14 @@ export function NO_NUMBER_START_CHAR(value: string): string {
  */
 export function NO_DUPLICATE_PROPERTIES(
   constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel,
-  objectModel: ObjectModel | UnionModel,
+  objectModel: ObjectModel,
   propertyName: string,
   namingFormatter: (value: string) => string
 ): string {
   // Make sure that the given property name is formatted correctly for further comparisons
   const formattedPropertyName = namingFormatter(propertyName);
   let newPropertyName = propertyName;
-  const alreadyPartOfMetaModel = Object.keys(objectModel instanceof UnionModel ? objectModel.commonProperties : objectModel.properties)
+  const alreadyPartOfMetaModel = Object.keys(objectModel.properties)
     .filter((key) => propertyName !== key) // Filter out the potential same property name that we can safely ignore for this check.
     .includes(formattedPropertyName);
   const alreadyPartOfConstrainedModel = Object.keys(

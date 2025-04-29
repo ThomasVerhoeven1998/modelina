@@ -18,7 +18,7 @@ export type PropertyKeyConstraintOptions = {
   NO_NUMBER_START_CHAR: (value: string) => string;
   NO_DUPLICATE_PROPERTIES: (
     constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel,
-    objectModel: ObjectModel | UnionModel,
+    objectModel: ObjectModel,
     propertyName: string,
     namingFormatter: (value: string) => string
   ) => string;

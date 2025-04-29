@@ -80,7 +80,7 @@ export type PropertyKeyContext<Options> = {
   constrainedObjectPropertyModel: ConstrainedObjectPropertyModel;
   objectPropertyModel: ObjectPropertyModel;
   constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel;
-  objectModel: ObjectModel | UnionModel;
+  objectModel: ObjectModel;
   options: Options;
 };
 
@@ -404,7 +404,7 @@ function createConstrainedPropertyModel<
   constrainRules: Constraints<Options>,
   context: ConstrainContext<
     Options,
-    ObjectModel | UnionModel,
+    ObjectModel,
     DependencyManager
   >,
   alreadySeenModels: Map<MetaModel, ConstrainedMetaModel>
