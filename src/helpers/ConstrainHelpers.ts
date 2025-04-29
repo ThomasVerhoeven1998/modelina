@@ -69,7 +69,7 @@ export type ModelNameConstraint<Options> = (
 export type PropertyKeyContext<Options> = {
   constrainedObjectPropertyModel: ConstrainedObjectPropertyModel;
   objectPropertyModel: ObjectPropertyModel;
-  constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel;
+  constrainedObjectModel: ConstrainedObjectModel;
   objectModel: ObjectModel;
   options: Options;
 };

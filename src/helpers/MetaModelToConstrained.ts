@@ -79,7 +79,7 @@ export type ModelNameConstraint<Options> = (
 export type PropertyKeyContext<Options> = {
   constrainedObjectPropertyModel: ConstrainedObjectPropertyModel;
   objectPropertyModel: ObjectPropertyModel;
-  constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel;
+  constrainedObjectModel: ConstrainedObjectModel;
   objectModel: ObjectModel;
   options: Options;
 };
@@ -400,7 +400,7 @@ function createConstrainedPropertyModel<
   DependencyManager extends AbstractDependencyManager
 >(
   propertyMetaModel: ObjectPropertyModel,
-  constrainedModel: ConstrainedObjectModel | ConstrainedUnionModel,
+  constrainedModel: ConstrainedObjectModel,
   constrainRules: Constraints<Options>,
   context: ConstrainContext<
     Options,

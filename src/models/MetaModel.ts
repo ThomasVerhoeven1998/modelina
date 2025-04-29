@@ -82,25 +82,6 @@ export class ArrayModel extends MetaModel {
   }
 }
 
-export function findCommonProperties<T>(objectProperties: { [key: string]: T }[]): { [key: string]: T } {
-  if (objectProperties.length === 0) {
-    return {};
-  }
-
-  // TODO deepEqual a, b
-  const ignoreOriginalInput = (key: string, value: any) => key === "originalInput" ? undefined : value;
-  const isEqual = <T>(a: T, b: T) => JSON.stringify(a, ignoreOriginalInput) === JSON.stringify(b, ignoreOriginalInput);
-
-  const commonPropertyList = objectProperties.slice(1)
-    .reduce((commonProperties, properties) => {
-      return commonProperties
-        .filter(([key]) => key in properties)
-        .filter(([key]) => key !== "additionalProperties")
-        .filter(([key, value]) => isEqual(properties[key], value));
-    }, Object.entries(objectProperties[0]));
-  return Object.fromEntries(commonPropertyList);
-}
-
 export class UnionModel extends MetaModel {
   constructor(
     name: string,
@@ -109,13 +90,6 @@ export class UnionModel extends MetaModel {
     public union: MetaModel[]
   ) {
     super(name, originalInput, options);
-  }
-  get commonProperties(): { [key: string]: ObjectPropertyModel } {
-    const objectProperties = this.union
-      .map(partModel => partModel instanceof ReferenceModel ? partModel.ref : partModel)
-      .filter((partModel): partModel is ObjectModel => partModel instanceof ObjectModel)
-      .map(partModel => partModel.properties);
-    return findCommonProperties(objectProperties);
   }
 }
 export class EnumValueModel {

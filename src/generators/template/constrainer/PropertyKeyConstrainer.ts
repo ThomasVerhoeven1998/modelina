@@ -1,11 +1,11 @@
-import { ConstrainedObjectModel, ConstrainedUnionModel, ObjectModel, UnionModel } from '../../../models';
+import { ConstrainedObjectModel, ObjectModel } from '../../../models';
 import {
   NO_NUMBER_START_CHAR,
   NO_DUPLICATE_PROPERTIES,
   NO_EMPTY_VALUE,
   NO_RESERVED_KEYWORDS
 } from '../../../helpers/Constraints';
-import { FormatHelpers, PropertyKeyConstraint } from '../../../helpers';
+import { FormatHelpers } from '../../../helpers';
 import { isReservedTemplateKeyword } from '../Constants';
 import { TemplatePropertyKeyConstraint } from '../TemplateGenerator';
 
@@ -13,8 +13,8 @@ export type PropertyKeyConstraintOptions = {
   NO_SPECIAL_CHAR: (value: string) => string;
   NO_NUMBER_START_CHAR: (value: string) => string;
   NO_DUPLICATE_PROPERTIES: (
-    constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel,
-    objectModel: ObjectModel | UnionModel,
+    constrainedObjectModel: ConstrainedObjectModel,
+    objectModel: ObjectModel,
     propertyName: string,
     namingFormatter: (value: string) => string
   ) => string;

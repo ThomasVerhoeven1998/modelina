@@ -24,7 +24,7 @@ export function NO_NUMBER_START_CHAR(value: string): string {
  * @param namingFormatter the name formatter which are used to format the property key
  */
 export function NO_DUPLICATE_PROPERTIES(
-  constrainedObjectModel: ConstrainedObjectModel | ConstrainedUnionModel,
+  constrainedObjectModel: ConstrainedObjectModel,
   objectModel: ObjectModel,
   propertyName: string,
   namingFormatter: (value: string) => string
@@ -36,7 +36,7 @@ export function NO_DUPLICATE_PROPERTIES(
     .filter((key) => propertyName !== key) // Filter out the potential same property name that we can safely ignore for this check.
     .includes(formattedPropertyName);
   const alreadyPartOfConstrainedModel = Object.keys(
-    constrainedObjectModel instanceof ConstrainedUnionModel ? constrainedObjectModel.commonProperties : constrainedObjectModel.properties
+    constrainedObjectModel.properties
   ).includes(formattedPropertyName);
   if (alreadyPartOfMetaModel || alreadyPartOfConstrainedModel) {
     newPropertyName = `reserved_${propertyName}`;
