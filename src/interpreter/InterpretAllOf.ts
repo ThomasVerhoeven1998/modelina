@@ -61,6 +61,7 @@ export default function interpretAllOf(
       const freshModel = interpreter.interpret(subSchema, {
         ...interpreterOptions
       });
+      //TODO issue is here, type is undefined
       if (freshModel && isModelObject(freshModel)) {
         Logger.info(
           `Processing allOf, inheritance is enabled, ${model.$id} inherits from ${freshModel.$id}`,

@@ -17,6 +17,9 @@ export function isEnum(model: CommonModel): boolean {
  * @param model
  */
 export function isModelObject(model: CommonModel): boolean {
+  if (model.discriminator !== undefined) {
+    return true;
+  }
   if (model.type !== undefined) {
     // If all possible JSON types are defined, don't split it even if it does contain object.
     if (Array.isArray(model.type) && model.type.length === 7) {
