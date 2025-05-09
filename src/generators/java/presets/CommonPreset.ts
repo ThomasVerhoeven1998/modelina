@@ -37,7 +37,7 @@ public boolean equals(Object o) {
     return false;
   }
   ${model.name} self = (${model.name}) o;
-    return 
+    return
 ${equalProperties.length > 0 ? renderer.indent(equalProperties, 6) : 'true'};
 }`;
 }
@@ -84,7 +84,7 @@ function renderToString({
 
   return `${renderer.renderAnnotation('Override')}
 public String toString() {
-  return "class ${model.name} {\\n" +   
+  return "class ${model.name} {\\n" +
 ${
   toStringProperties.length > 0
     ? renderer.indent(renderer.renderBlock(toStringProperties), 4)

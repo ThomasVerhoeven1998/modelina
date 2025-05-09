@@ -1,5 +1,6 @@
 import { JavaRenderer } from '../JavaRenderer';
 import {
+  ConstrainedArrayModel,
   ConstrainedDictionaryModel,
   ConstrainedObjectModel,
   ConstrainedObjectPropertyModel,
@@ -27,7 +28,10 @@ export class ClassRenderer extends JavaRenderer<ConstrainedObjectModel> {
       await this.runAdditionalContentPreset()
     ];
 
-    if (this.options?.collectionType === 'List') {
+    if (
+      this.model.containsPropertyType(ConstrainedArrayModel) &&
+      this.options?.collectionType === 'List'
+    ) {
       this.dependencyManager.addDependency('import java.util.List;');
     }
     if (this.model.containsPropertyType(ConstrainedDictionaryModel)) {
@@ -144,7 +148,10 @@ const getOverride = (
   );
 
   const overrideFromExtend = model.options.extend?.find((extend) => {
-    if (!extend.options.isExtended || isDictionary(model, property)) {
+    if (
+      !extend.options.isExtended ||
+      property.property instanceof ConstrainedDictionaryModel
+    ) {
       return false;
     }
 
@@ -170,19 +177,26 @@ const getOverride = (
 export const isDiscriminatorOrDictionary = (
   model: ConstrainedObjectModel,
   property: ConstrainedObjectPropertyModel
-): boolean => isDiscriminator(model, property) || isDictionary(model, property);
+): boolean =>
+  model.options.discriminator?.discriminator ===
+    property.unconstrainedPropertyName ||
+  property.property instanceof ConstrainedDictionaryModel;
 
-export const isDiscriminator = (
+export const isDiscriminatorInTree = (
   model: ConstrainedObjectModel,
   property: ConstrainedObjectPropertyModel
 ): boolean =>
-  model.options.discriminator?.discriminator ===
-  property.unconstrainedPropertyName;
-
-export const isDictionary = (
-  model: ConstrainedObjectModel,
-  property: ConstrainedObjectPropertyModel
-): boolean => property.property instanceof ConstrainedDictionaryModel;
+  (model.options?.extend?.some(
+    (ext) =>
+      ext?.options?.discriminator?.discriminator ===
+      property.unconstrainedPropertyName
+  ) ||
+    model.options?.parents?.some(
+      (parent) =>
+        parent?.options?.discriminator?.discriminator ===
+        property.unconstrainedPropertyName
+    )) ??
+  false;
 
 const isEnumImplementedByConstValue = (
   model: ConstrainedObjectModel,
@@ -233,13 +247,22 @@ export const JAVA_DEFAULT_CLASS_PRESET: ClassPresetType<JavaOptions> = {
   self({ renderer }) {
     return renderer.defaultSelf();
   },
-  property({ property, model }) {
+  property({ property, model, options }) {
     if (model.options.isExtended) {
       return '';
     }
 
     if (property.property.options.const?.value) {
       return `private final ${property.property.type} ${property.propertyName} = ${property.property.options.const.value};`;
+    }
+
+    if (
+      options.useModelNameAsConstForDiscriminatorProperty &&
+      property.unconstrainedPropertyName ===
+        model.options.discriminator?.discriminator &&
+      property.property.type === 'String'
+    ) {
+      return `private final ${property.property.type} ${property.propertyName} = "${model.name}";`;
     }
 
     return `private ${property.property.type} ${property.propertyName};`;
@@ -280,7 +303,7 @@ export const JAVA_DEFAULT_CLASS_PRESET: ClassPresetType<JavaOptions> = {
       return `public void set${setterName}(${property.property.type} ${property.propertyName});`;
     }
 
-    if (isDiscriminator(model, property)) {
+    if (isDiscriminatorInTree(model, property)) {
       return '';
     }
 

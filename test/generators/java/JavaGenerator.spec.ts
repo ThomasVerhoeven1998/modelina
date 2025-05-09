@@ -479,7 +479,7 @@ describe('JavaGenerator', () => {
         ],
         collectionType: 'List',
         processorOptions: {
-          interpreter: {
+          jsonSchema: {
             allowInheritance: true
           }
         }
@@ -1068,6 +1068,376 @@ describe('JavaGenerator', () => {
     });
   });
 
+  describe('allowInheritance with allOf with caching enabled', () => {
+    test('should create interface for Pet without causing infinite loop', async () => {
+      const asyncapiDoc = {
+        asyncapi: '2.5.0',
+        info: {
+          title: 'CloudEvent example',
+          version: '1.0.0'
+        },
+        channels: {
+          owner: {
+            publish: {
+              message: {
+                $ref: '#/components/messages/Owner'
+              }
+            }
+          }
+        },
+        components: {
+          messages: {
+            Owner: {
+              payload: {
+                $ref: '#/components/schemas/Owner'
+              }
+            }
+          },
+          schemas: {
+            Owner: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                },
+                pets: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/Pet'
+                  }
+                }
+              }
+            },
+            Pet: {
+              title: 'Pet',
+              type: 'object',
+              discriminator: 'petType',
+              properties: {
+                petType: {
+                  type: 'string'
+                }
+              },
+              required: ['petType'],
+              oneOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                },
+                {
+                  $ref: '#/components/schemas/Bird'
+                },
+                {
+                  $ref: '#/components/schemas/FlyingFish'
+                }
+              ]
+            },
+            Bird: {
+              title: 'Bird',
+              properties: {
+                breed: {
+                  type: String
+                }
+              },
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            Fish: {
+              title: 'Fish',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            FlyingFish: {
+              title: 'FlyingFish',
+              type: 'object',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                }
+              ],
+              properties: {
+                breed: {
+                  const: 'FlyingNemo'
+                }
+              }
+            }
+          }
+        }
+      };
+
+      generator = new JavaGenerator({
+        presets: [
+          JAVA_COMMON_PRESET,
+          JAVA_JACKSON_PRESET,
+          JAVA_DESCRIPTION_PRESET,
+          JAVA_CONSTRAINTS_PRESET
+        ],
+        collectionType: 'List',
+        processorOptions: {
+          jsonSchema: {
+            allowInheritance: true,
+            disableCache: false
+          }
+        }
+      });
+
+      const models = await generator.generate(asyncapiDoc);
+      expect(models.map((model) => model.result)).toMatchSnapshot();
+    });
+  });
+
+  describe('allowInheritance with automatically determine of discriminator const', () => {
+    test('should fill in petType with class name', async () => {
+      const asyncapiDoc = {
+        asyncapi: '2.5.0',
+        info: {
+          title: 'CloudEvent example',
+          version: '1.0.0'
+        },
+        channels: {
+          owner: {
+            publish: {
+              message: {
+                $ref: '#/components/messages/Owner'
+              }
+            }
+          }
+        },
+        components: {
+          messages: {
+            Owner: {
+              payload: {
+                $ref: '#/components/schemas/Owner'
+              }
+            }
+          },
+          schemas: {
+            Owner: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                },
+                pets: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/Pet'
+                  }
+                }
+              }
+            },
+            Pet: {
+              title: 'Pet',
+              type: 'object',
+              discriminator: 'petType',
+              properties: {
+                petType: {
+                  type: 'string'
+                }
+              },
+              required: ['petType'],
+              oneOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                },
+                {
+                  $ref: '#/components/schemas/Bird'
+                },
+                {
+                  $ref: '#/components/schemas/FlyingFish'
+                }
+              ]
+            },
+            Bird: {
+              title: 'Bird',
+              properties: {
+                breed: {
+                  type: 'string'
+                }
+              },
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            Fish: {
+              title: 'Fish',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            FlyingFish: {
+              title: 'FlyingFish',
+              type: 'object',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                }
+              ],
+              properties: {
+                breed: {
+                  const: 'FlyingNemo'
+                }
+              }
+            }
+          }
+        }
+      };
+
+      generator = new JavaGenerator({
+        presets: [
+          JAVA_COMMON_PRESET,
+          JAVA_JACKSON_PRESET,
+          JAVA_DESCRIPTION_PRESET,
+          JAVA_CONSTRAINTS_PRESET
+        ],
+        collectionType: 'List',
+        useModelNameAsConstForDiscriminatorProperty: true,
+        processorOptions: {
+          jsonSchema: {
+            allowInheritance: true,
+            disableCache: false
+          }
+        }
+      });
+
+      const models = await generator.generate(asyncapiDoc);
+      expect(models.map((model) => model.result)).toMatchSnapshot();
+    });
+  });
+
+  describe('throw error when allowInheritance enabled with caching disabled', () => {
+    test('should throw error cause caching is disabled', async () => {
+      const asyncapiDoc = {
+        asyncapi: '2.5.0',
+        info: {
+          title: 'CloudEvent example',
+          version: '1.0.0'
+        },
+        channels: {
+          owner: {
+            publish: {
+              message: {
+                $ref: '#/components/messages/Owner'
+              }
+            }
+          }
+        },
+        components: {
+          messages: {
+            Owner: {
+              payload: {
+                $ref: '#/components/schemas/Owner'
+              }
+            }
+          },
+          schemas: {
+            Owner: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                },
+                pets: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/Pet'
+                  }
+                }
+              }
+            },
+            Pet: {
+              title: 'Pet',
+              type: 'object',
+              discriminator: 'petType',
+              properties: {
+                petType: {
+                  type: 'string'
+                }
+              },
+              required: ['petType'],
+              oneOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                },
+                {
+                  $ref: '#/components/schemas/Bird'
+                },
+                {
+                  $ref: '#/components/schemas/FlyingFish'
+                }
+              ]
+            },
+            Bird: {
+              title: 'Bird',
+              properties: {
+                breed: {
+                  type: String
+                }
+              },
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            Fish: {
+              title: 'Fish',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            FlyingFish: {
+              title: 'FlyingFish',
+              type: 'object',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Fish'
+                }
+              ],
+              properties: {
+                breed: {
+                  const: 'FlyingNemo'
+                }
+              }
+            }
+          }
+        }
+      };
+
+      generator = new JavaGenerator({
+        presets: [
+          JAVA_COMMON_PRESET,
+          JAVA_JACKSON_PRESET,
+          JAVA_DESCRIPTION_PRESET,
+          JAVA_CONSTRAINTS_PRESET
+        ],
+        collectionType: 'List',
+        processorOptions: {
+          jsonSchema: {
+            allowInheritance: true,
+            disableCache: true
+          }
+        }
+      });
+
+      await expect(generator.generate(asyncapiDoc)).rejects.toEqual(
+        new Error(
+          'Inheritance is enabled in combination with allOf but cache is disabled. Inheritance will not work as expected.'
+        )
+      );
+    });
+  });
+
   describe('oneOf/discriminator', () => {
     test('should create an interface', async () => {
       const asyncapiDoc = {
@@ -1601,6 +1971,122 @@ describe('JavaGenerator', () => {
         const models = await generator.generate(asyncapiDoc);
         expect(models.map((model) => model.result)).toMatchSnapshot();
       });
+    });
+  });
+
+  describe('with inheritance using records', () => {
+    test('should create interface with getters without "get" prefix', async () => {
+      const asyncapiDoc = {
+        asyncapi: '3.0.0',
+        info: {
+          title: 'Records succesfully implement interfaces',
+          version: '1.0.0'
+        },
+        channels: {
+          ownerCreated: {
+            address: 'owner-created',
+            messages: {
+              OwnerCreated: {
+                $ref: '#/components/messages/Owner'
+              }
+            }
+          }
+        },
+        operations: {
+          processOwnerCreated: {
+            action: 'receive',
+            channel: {
+              $ref: '#/channels/ownerCreated'
+            }
+          }
+        },
+        components: {
+          messages: {
+            Owner: {
+              payload: {
+                schema: {
+                  $ref: '#/components/schemas/Owner'
+                }
+              }
+            }
+          },
+          schemas: {
+            Pet: {
+              title: 'Pet',
+              type: 'object',
+              discriminator: 'petType',
+              properties: {
+                petType: {
+                  type: 'string'
+                },
+                color: {
+                  type: 'string'
+                }
+              },
+              oneOf: [
+                {
+                  $ref: '#/components/schemas/Cat'
+                },
+                {
+                  $ref: '#/components/schemas/Dog'
+                }
+              ],
+              required: ['petType', 'color']
+            },
+            Cat: {
+              title: 'Cat',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            Dog: {
+              title: 'Dog',
+              allOf: [
+                {
+                  $ref: '#/components/schemas/Pet'
+                }
+              ]
+            },
+            Owner: {
+              title: 'Owner',
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                },
+                pet: {
+                  items: {
+                    $ref: '#/components/schemas/Pet'
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+
+      generator = new JavaGenerator({
+        presets: [
+          JAVA_COMMON_PRESET,
+          JAVA_JACKSON_PRESET,
+          JAVA_DESCRIPTION_PRESET,
+          JAVA_CONSTRAINTS_PRESET
+        ],
+        modelType: 'record',
+        collectionType: 'List',
+        processorOptions: {
+          jsonSchema: {
+            disableCache: false,
+            allowInheritance: true,
+            ignoreAdditionalProperties: true
+          }
+        }
+      });
+
+      const models = await generator.generate(asyncapiDoc);
+      expect(models.map((model) => model.result)).toMatchSnapshot();
     });
   });
 });
